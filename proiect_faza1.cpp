@@ -2,6 +2,7 @@
 // Mitrofan Daria - Medical
 
 #include <iostream>
+#include <vector>
 using namespace std;
 
 class Spital
@@ -68,9 +69,10 @@ public:
 		this->nrMedici = s.nrMedici;
 		this->nrSpecializari = s.nrSpecializari;
 
-		if (this->numeSpecializari != NULL) {
-			delete[]this->numeSpecializari;
-		}
+		/*if (this->numeSpecializari != NULL) {
+			delete[] this->numeSpecializari;
+		}*/
+
 		if (this->nrSpecializari > 0) {
 			this->numeSpecializari = new string[nrSpecializari];
 			for (int i = 0; i < nrSpecializari; i++) {
@@ -131,7 +133,7 @@ public:
 	//Functii prietene
 	friend istream& operator>>(istream& in, Spital& spital);
 
-	friend ostream& operator<<(ostream& out, Spital& spital);
+	friend ostream& operator<<(ostream& out, const Spital& spital);
 	
 
 	/*const string adresa;
@@ -143,7 +145,7 @@ public:
 	static int anInfiintare;*/
 
 
-	void afisare() {
+	void afisare() const {
 		cout << "Spitalul " << nume << " se afla in orasul " << adresa << " si are un numar de " << nrMedici << " medici si " << nrSpecializari << " specializari: ";
 		for (int i = 0; i < this->nrSpecializari; i++) {
 			cout << numeSpecializari[i] << ", ";
@@ -233,6 +235,8 @@ public:
 	}
 
 
+	
+
 }; 
 int Spital::anInfiintare = 1923;
 
@@ -254,9 +258,13 @@ istream& operator>>(istream& in, Spital& spital) {
 	cout << endl;
 	return in;
 }
+//ostream& operator<<(ostream& out, const Spital& spital) {
+//	 Implementarea afișării obiectului Spital
+//	out << "Spitalul " << spital.nume << " ... "; // Adăugați detaliile necesare
+//	return out;
+//}
 
-
-ostream& operator<<(ostream& out, Spital& spital) {
+ostream& operator<<(ostream& out, const Spital& spital) {
 	out << "Spitalul " << spital.nume << " are " << spital.nrMedici << " de medici si " << spital.nrSpecializari << " specializari. Acestea sunt: ";
 	if (spital.nrSpecializari != NULL) {
 		for (int i = 0;i < spital.nrSpecializari;i++) {
@@ -378,7 +386,7 @@ public:
 	int* varstePacienti;
 	static int gradSeveritate;*/
 
-	void afisare() {
+	void afisare() const {
 		cout << id << " . " << " Numele: " << nume << " . " << "  Grad severitate: " << gradSeveritate << ". Nr pacienti " << nrPacienti << " , varste: ";
 		if (varstePacienti != NULL)
 		{
@@ -412,7 +420,7 @@ public:
 		return *this;
 	}
 
-	friend ostream& operator<<(ostream& out, Pacient& pacient);
+	friend ostream& operator<<(ostream& out, const Pacient& pacient);
 
 	//Operator --
 
@@ -456,12 +464,48 @@ public:
 		return *this;
 	}
 
-
+	friend istream& operator>>(istream& in, Pacient& pacient);
+		
 
 };
 int Pacient::gradSeveritate = 4;
+//istream& operator>>(istream& in, Spital& spital) {
+//	cout << "Spitalul "; in >> spital.nume;
+//	//cout << " Orasul in care se afla spitalul este: "; in >> spital.adresa;
+//	cout << "Nr. medici: "; in >> spital.nrMedici;
+//	cout << "Nr. de specializari: "; in >> spital.nrSpecializari;
+//	if (spital.numeSpecializari) {
+//		delete[]spital.numeSpecializari;
+//	}
+//	spital.numeSpecializari = new string[spital.nrSpecializari];
+//	cout << "Specializarile sunt: ";
+//	for (int i = 0; i < spital.nrSpecializari; i++) {
+//		in >> spital.numeSpecializari[i];
+//	}
+//	cout << " Aceasta s-a infiintat in anul: "; in >> spital.anInfiintare;
+//	cout << endl;
+//	return in;
+//}
 
-ostream& operator<<(ostream& out, Pacient& pacient) {
+
+istream& operator>>(istream& in, Pacient& pacient) {
+	cout << "Numele pacientului: ";
+	in >> pacient.nume;
+	cout << endl << "Nr. pacienti: ";
+	in >> pacient.nrPacienti;
+
+	if (pacient.varstePacienti != NULL) {
+		delete[] pacient.varstePacienti;
+	}
+	pacient.varstePacienti = new int[pacient.nrPacienti];
+	for (int i=0;i < pacient.nrPacienti;i++) {
+		cout << endl << "Varstele pacientilor: ";
+		in >> pacient.varstePacienti[i];
+	}
+	return in;
+}
+
+ostream& operator<<(ostream& out, const Pacient& pacient) {
 	out << "Pacientii cu numele: " << pacient.nume <<endl<< "Nr. de pacienti este de: " << pacient.nrPacienti << endl << "Varstele pacientilor sunt: ";
 	if (pacient.nrPacienti != NULL) {
 		for (int i = 0;i < pacient.nrPacienti;i++) {
@@ -591,7 +635,7 @@ public:
 	string* substanteActive;
 	static int nrMaximSubstante;*/
 
-	void afisare() {
+	void afisare() const {
 		cout << id << " . " << "Nume medicament: " << nume << " . Pret: " << pret << "."<<endl<< "Nr.maxim de substante active este : " << nrMaximSubstante << "." << " Nr. substante:" << nrSubstante << ". Substantele active pe care le contine medicamentul : ";
 		if (substanteActive != NULL) {
 			for (int i = 0; i < this->nrSubstante; i++) {
@@ -656,299 +700,451 @@ public:
 		return diferenta;
 	}
 
+	friend ostream& operator<<(ostream& out, const Medicamente& medicament);
 
+	friend istream& operator>>(istream& in, Medicamente& medicament);
 
 
 };
 int Medicamente::nrMaximSubstante = 5;
 
 
+ istream& operator>>(istream& in, Medicamente& medicament) {
+	cout << "Medicamentul: ";
+	in >> medicament.nume;
+	cout << endl << "Pretul medicamentului: ";
+	in >> medicament.pret;
+	cout << endl << "Nr. substante active: ";
+	in >> medicament.nrSubstante;
+	if (medicament.substanteActive != NULL) {
+		delete[] medicament.substanteActive;
+	}
+	medicament.substanteActive = new string[medicament.nrSubstante];
+	for (int i=0;i < medicament.nrSubstante;i++) {
+		cout << endl << "Nume substante active: ";
+		in >> medicament.substanteActive[i];
+	}
+	return in;
+}
+
+ostream& operator<<(ostream& out, const Medicamente& medicament) {
+	out << "Medicamentul: " << medicament.nume << endl << "Pretul este: " << medicament.pret << endl << "Nr. de substante active: ";
+	if (medicament.nrSubstante != NULL) {
+		for (int i = 0;i < medicament.nrSubstante;i++) {
+			out << medicament.substanteActive[i] << ", ";
+		}
+	}
+	else {
+		out << " - ";
+	}
+
+	return out;
+}
+
+
+
 
 int main()
 {   //Spital
-	cout << "Spitale:" << endl;
-	string nume[] = { " Chirurgie cardiovasculara ", "Cardiologie","Pneumologie", "Endocrinologie" };
-	Spital spital1;
-	spital1.afisare();
-	cout << endl;
-	Spital spital2("Bucuresti", "de Urgenta 'Sfantul Pantelimon'", 140, 4, nume, true);
-	spital2.afisare();
-	cout << endl;
-	Spital spital3("Iasi", "de Urgenta 'Sfantul Mihail'");
-	spital3.afisare();
-	cout << endl;
+//	cout << "Spitale:" << endl;
+//	string nume[] = { " Chirurgie cardiovasculara ", "Cardiologie","Pneumologie", "Endocrinologie" };
+//	Spital spital1;
+//	spital1.afisare();
+//	cout << endl;
+	//Spital spital2("Bucuresti", "de Urgenta 'Sfantul Pantelimon'", 140, 4, nume, true);
+	//spital2.afisare();
+	//cout << endl;
+	//Spital spital3("Iasi", "de Urgenta 'Sfantul Mihail'");
+	//spital3.afisare();
+	//cout << endl;
 
-	Spital spital4 = spital1;
-	spital4.afisare();
-	cout << endl;
+	//Spital spital4 = spital1;
+	//spital4.afisare();
+	//cout << endl;
 
-	//Getteri
-	Spital spital5;
-	cout << spital5.getAdresa() << endl;
-	cout << "Spitalul " << spital5.getNume() << endl;
-	cout << "Nr. medici: " << spital5.getNrMedici() << endl;
-	cout << "Nr. specializari: " << spital5.getNrSpecializari() << endl;
-	cout << "Specializari: ";
-	for (int i=0;i < spital5.getNrSpecializari();i++) {
-		cout << spital5.getNumeSpecializari()[i] << ", ";
-	}
-	cout << endl;
-	cout << "Anul de infiintare este: " << spital5.getInfiintare() << endl;
-	cout << endl;
+	////Getteri
+	//Spital spital5;
+	//cout << spital5.getAdresa() << endl;
+	//cout << "Spitalul " << spital5.getNume() << endl;
+	//cout << "Nr. medici: " << spital5.getNrMedici() << endl;
+	//cout << "Nr. specializari: " << spital5.getNrSpecializari() << endl;
+	//cout << "Specializari: ";
+	//for (int i=0;i < spital5.getNrSpecializari();i++) {
+	//	cout << spital5.getNumeSpecializari()[i] << ", ";
+	//}
+	//cout << endl;
+	//cout << "Anul de infiintare este: " << spital5.getInfiintare() << endl;
+	//cout << endl;
 
-	//Setteri
-	string numeNoi[] = { "Cardiologie", "Ortopedie" };
-	spital5.setNume("Spitalul Clinic Municipal de Urgenta");
-	spital5.setNrMedici(67);
-	spital5.setSpecializari(2, numeNoi);
-	spital5.setInfiintare(1928);
-	cout << spital5.getNume() << endl;
-	cout << "Nr. medici: " << spital5.getNrMedici() << endl;
-	cout << "Nr. specializari: " << spital5.getNrSpecializari() << endl;
-	cout << "Specializari: ";
-	for (int i = 0;i < spital5.getNrSpecializari();i++) {
-		cout << spital5.getNumeSpecializari()[i] << ", ";
-	}
-	cout << endl;
-	cout << "Anul de infiintare este: " << spital5.getInfiintare() << endl;
-	cout << endl;
-	cout << endl;
+	////Setteri
+	//string numeNoi[] = { "Cardiologie", "Ortopedie" };
+	//spital5.setNume("Spitalul Clinic Municipal de Urgenta");
+	//spital5.setNrMedici(67);
+	//spital5.setSpecializari(2, numeNoi);
+	//spital5.setInfiintare(1928);
+	//cout << spital5.getNume() << endl;
+	//cout << "Nr. medici: " << spital5.getNrMedici() << endl;
+	//cout << "Nr. specializari: " << spital5.getNrSpecializari() << endl;
+	//cout << "Specializari: ";
+	//for (int i = 0;i < spital5.getNrSpecializari();i++) {
+	//	cout << spital5.getNumeSpecializari()[i] << ", ";
+	//}
+	//cout << endl;
+	//cout << "Anul de infiintare este: " << spital5.getInfiintare() << endl;
+	//cout << endl;
+	//cout << endl;
 
-	//Functie globala
-	
+	////Functie globala
+	//
+	////Spital spital6;
+	////cin >> spital2;
+	////cout << spital2;
+	//cout << endl;
+	//cout << endl;
+
+	//cout << "Operatorii: = , ++, cast, index." << endl;
+
+	////operator =
 	//Spital spital6;
-	//cin >> spital2;
-	//cout << spital2;
-	cout << endl;
-	cout << endl;
+	//spital6 = spital2;
+	//cout << spital6 << endl;
+	//cout << endl;
+	//cout << endl;
 
-	cout << "Operatorii: = , ++, cast, index." << endl;
+	////Operator de indexare
+	//cout << "Postincrementare: " << endl;
+	//Spital spital7;
+	//spital7 = spital2++;
+	//cout << spital2 << endl;
+	//cout << spital7 << endl;
+	//cout << endl;
 
-	//operator =
-	Spital spital6;
-	spital6 = spital2;
-	cout << spital6 << endl;
-	cout << endl;
-	cout << endl;
-
-	//Operator de indexare
-	cout << "Postincrementare: " << endl;
-	Spital spital7;
-	spital7 = spital2++;
-	cout << spital2 << endl;
-	cout << spital7 << endl;
-	cout << endl;
-
-	cout << "Preincrementare: " << endl;
-	Spital spital8;
-	spital8 = ++spital2;
-	cout << spital2 << endl;
-	cout << spital8 << endl;
-	cout << endl;
-	cout << endl;
+	//cout << "Preincrementare: " << endl;
+	//Spital spital8;
+	//spital8 = ++spital2;
+	//cout << spital2 << endl;
+	//cout << spital8 << endl;
+	//cout << endl;
+	//cout << endl;
 
 
 
-	//operator cast
-	cout << "Numarul de medici din Spitalul de Urgenta 'Sfantul Constantin' este:" << endl;
-	int b = spital1;
-	cout << b << endl;
-	cout << endl;
-	cout << endl;
+	////operator cast
+	//cout << "Numarul de medici din Spitalul de Urgenta 'Sfantul Constantin' este:" << endl;
+	//int b = spital1;
+	//cout << b << endl;
+	//cout << endl;
+	//cout << endl;
 
-	//operator index
-	cout << spital1[1] << endl;
-	spital1[0] = "Chirurgie generala";
-	cout << endl;
-	cout << endl;
+	////operator index
+	//cout << spital1[1] << endl;
+	//spital1[0] = "Chirurgie generala";
+	//cout << endl;
+	//cout << endl;
+
+
+
+
+
+
+		//const int dimensiuneVector = 3;
+		//Spital vectorSpitale[dimensiuneVector];
+
+		//// Citirea obiectelor pentru vector de la tastatură și afișarea lor
+		//for (int i = 0; i < dimensiuneVector; ++i)
+		//{
+		//	cout << "Introduceti informatiile pentru spitalul " << i + 1 << ":" << endl;
+		//	cin >> vectorSpitale[i];
+		//	cout << "Informatii pentru spitalul " << i + 1 << ":" << endl;
+		//	cout << vectorSpitale[i] << endl;
+		//}
+
+		//// Parcurgerea vectorului separat
+		//cout << "Parcurgerea vectorului separat:" << endl;
+		//for (int i = 0; i < dimensiuneVector; ++i)
+		//{
+		//	vectorSpitale[i].afisare();
+		//	cout << endl;
+		//}
+
+		//const int liniiMatrice = 2;
+		//const int coloaneMatrice = 2;
+		//Spital matriceSpitale[liniiMatrice][coloaneMatrice];
+
+		//// Citirea obiectelor pentru matrice de la tastatură și afișarea lor
+		//for (int i = 0; i < liniiMatrice; ++i)
+		//{
+		//	for (int j = 0; j < coloaneMatrice; ++j)
+		//	{
+		//		cout << "Introduceti informatiile pentru spitalul de pe pozitia " << i + 1 << ", " << j + 1 << ":" << endl;
+		//		cin >> matriceSpitale[i][j];
+		//		cout << "Informatii pentru spitalul de pe pozitia " << i + 1 << ", " << j + 1 << ":" << endl;
+		//		cout << matriceSpitale[i][j] << endl;
+		//	}
+		//}
+
+		//return 0;
+	
+
+
+
 
 
 
 
     //PACIENTI
-	cout << "Pacienti:" << endl;
-	int varste[] = {14,21,32};
-	Pacient pacient1;
-	pacient1.afisare();
-	Pacient pacient2(2, "Bogdan", 3, varste);
-	pacient2.afisare();
-	Pacient pacient3(7, "Andrei");
-	pacient3.afisare();
-	cout << endl;
-	//Constructor de copiere
-	Pacient pacient4 = pacient1;
-	pacient4.afisare();
-	cout << endl;
+	//cout << "Pacienti:" << endl;
+	//int varste[] = {14,21,32};
+	//Pacient pacient1;
+	//pacient1.afisare();
+	//Pacient pacient2(2, "Bogdan", 3, varste);
+	//pacient2.afisare();
+	//Pacient pacient3(7, "Andrei");
+	//pacient3.afisare();
+	//cout << endl;
+	////Constructor de copiere
+	//Pacient pacient4 = pacient1;
+	//pacient4.afisare();
+	//cout << endl;
 
-	//Getteri
-	Pacient pacient5;
-	cout << pacient5.getId() << endl;
-	cout << "Nume: " << pacient5.getNume() << endl;
-	cout << "Nr. pacienti: " << pacient5.getNrPacienti() << endl;
-	cout << "Varstele pacientilor: -";
-	for (int i = 0;i < pacient5.getNrPacienti();i++) {
-		cout << pacient5.getVarstePacienti()[i] << endl;
+	////Getteri
+	//Pacient pacient5;
+	//cout << pacient5.getId() << endl;
+	//cout << "Nume: " << pacient5.getNume() << endl;
+	//cout << "Nr. pacienti: " << pacient5.getNrPacienti() << endl;
+	//cout << "Varstele pacientilor: -";
+	//for (int i = 0;i < pacient5.getNrPacienti();i++) {
+	//	cout << pacient5.getVarstePacienti()[i] << endl;
+	//}
+	//cout << endl;
+	//cout << "Grad severitate: " << pacient5.getGrad() << endl;
+	//cout << endl;
+
+	////Setteri
+	//int varsteNoi[] = { 22,41 };
+	//pacient5.setNume("Ana");
+	//pacient5.setPacienti(2, varsteNoi);
+	//pacient5.setGrad(3);
+	//cout << "Nume: " << pacient5.getNume() << endl;
+	//cout << "Nr. pacienti: " << pacient5.getNrPacienti() << endl;
+	//cout << "Varstele pacientilor: ";
+	//for (int i = 0;i < pacient5.getNrPacienti();i++) {
+	//	cout << pacient5.getVarstePacienti()[i] <<  ", ";
+	//}
+	//cout << endl;
+	//cout << "Grad severitate: " << pacient5.getGrad() << endl;
+	//cout << endl;
+	//cout << endl;
+	//
+	//cout << "Operatorii: = , --, cast, +=." << endl;
+
+	////Operator =
+	//Pacient pacient6;
+	//pacient6 = pacient2;
+	//cout << pacient6.getId() << endl;
+	//cout << "Nume: " << pacient6.getNume() << endl;
+	//cout << "Nr. pacienti: " << pacient6.getNrPacienti() << endl;
+	//cout << "Varstele pacientilor: ";
+	//for (int i = 0;i < pacient6.getNrPacienti();i++) {
+	//	cout << pacient6.getVarstePacienti()[i] << ", ";
+	//}
+	//cout << endl;
+	//cout << "Grad severitate: " << pacient6.getGrad() << endl;
+	//cout << endl;
+
+
+	//cout << endl;
+	//cout << endl;
+
+	//cout << pacient2 << endl;
+	//cout << endl;
+	////Operator --
+	//Pacient pacient7;
+	//--pacient2;
+	//pacient7 = pacient2--;
+	//cout << pacient2;
+	//cout << endl;
+	//cout << endl;
+	//cout << pacient7;
+	//cout << endl;
+	//cout << endl;
+	//
+	////operator cast
+	//cout << "Numarul de pacienti cu numele de Ana este:" << endl;
+	//int p = pacient5;
+	//cout << p << endl;
+	//cout << endl;
+	//cout << endl;
+
+	//cout << endl;
+	//// Utilizare operator +=
+	//pacient1 += pacient5;
+
+	//cout << "\nPacient 1 dupa adaugare:" << endl;
+	//pacient1.afisare();
+	//cout << endl;
+	//cout << endl;
+
+
+	//cout << endl;
+
+
+	////MEDICAMENTE
+	//cout << "Medicamente:" << endl;
+	//string substante[] = {"Amoxicilina","Acid clavulanic"};
+	//Medicamente medicament1;
+	//medicament1.afisare();
+	//cout << endl;
+	//Medicamente medicament2(200, "Augmentin", 21.68, 2, substante);
+	//medicament2.afisare();
+	//cout << endl;
+	//Medicamente medicament3(300, "Paracetamol");
+	//medicament3.afisare();
+	//cout << endl;
+	//Medicamente medicament4 = medicament2;
+	//medicament4.afisare();
+	//cout << endl;
+	//cout << endl;
+
+	////Getteri
+	//Medicamente med5;
+	//cout << med5.getId() << endl;
+	//cout << "Nume medicament: " << med5.getNume() << endl;
+	//cout << "Pret: " << med5.getPret() << endl;
+	//cout << "Nr substante active: " << med5.getNrSubstante() << endl;
+	//cout << "Substante active: -";
+	//for (int i = 0;i < med5.getNrSubstante();i++) {
+	//	cout << med5.getSubstanteActive()[i] << endl;
+	//}
+	//cout << endl;
+	//cout << "Nr. maxim de substante active: " << med5.getMaxSubstante() << endl;
+	//cout << endl;
+	//
+	////Setteri
+	//string substanteNoi[] = { "Clorhidratul de drotaverina" };
+	//med5.setNume("No-Spa");
+	//med5.setPret(15.98);
+	//med5.setSubstante(1, substanteNoi);
+	//cout << "Nume medicament: " << med5.getNume() << endl;
+	//cout << "Pret: " << med5.getPret() << endl;
+	//cout << "Nr substante active: " << med5.getNrSubstante() << endl;
+	//cout << "Substanta activa: ";
+	//for (int i = 0;i < med5.getNrSubstante();i++) {
+	//	cout << med5.getSubstanteActive()[i] << endl;
+	//}
+	//cout << endl;
+	//cout << endl;
+
+
+	//cout <<"Operatorii: = , +=, ==, de scadere."<< endl;
+
+	////operator =
+	//Medicamente med6;
+	//med6 = medicament2;
+	//cout << med6.getId() << endl;
+	//cout << "Nume medicament: " << med6.getNume() << endl;
+	//cout << "Pret: " << med6.getPret() << endl;
+	//cout << "Nr substante active: " << med6.getNrSubstante() << endl;
+	//cout << "Substante active: ";
+	//for (int i = 0;i < med6.getNrSubstante();i++) {
+	//	cout << med6.getSubstanteActive()[i] << ", ";
+	//}
+	//cout << endl;
+	//cout << "Nr. maxim de substante active: " << med6.getMaxSubstante() << endl;
+	//cout << endl;
+	//cout << endl;
+
+
+	////Operator +=
+	//medicament2 += medicament3;
+
+	//cout << "Pretul dupa adunare: " << medicament2.getPret() << endl;
+
+	//cout << endl;
+	//cout << endl;
+	////Operator ==
+	//if (medicament1 == medicament2) {
+	//	cout << "Medicamentele sunt identice." << endl;
+	//}
+	//else {
+	//	cout << "Medicamentele sunt diferite." << endl;
+	//}
+
+
+	//cout << endl;
+	//cout << endl;
+
+	////Operator de scădere -
+	//Medicamente medicamentDiferenta = medicament1 - medicament2;
+	//cout << "Pretul diferentei: " << medicamentDiferenta.getPret() << endl;
+
+
+
+
+
+
+
+
+
+
+	// Vector de obiecte Spital
+	std::vector<Spital> vectorSpitale;
+	int numarSpitale;
+
+	std::cout << "Introduceti numarul de spitale: ";
+	std::cin >> numarSpitale;
+
+	for (int i = 0; i < numarSpitale; ++i) {
+		Spital spital;
+		std::cin >> spital;  // Operatorul >> pentru citirea unui obiect Spital de la tastatură
+		vectorSpitale.push_back(spital);
 	}
-	cout << endl;
-	cout << "Grad severitate: " << pacient5.getGrad() << endl;
-	cout << endl;
 
-	//Setteri
-	int varsteNoi[] = { 22,41 };
-	pacient5.setNume("Ana");
-	pacient5.setPacienti(2, varsteNoi);
-	pacient5.setGrad(3);
-	cout << "Nume: " << pacient5.getNume() << endl;
-	cout << "Nr. pacienti: " << pacient5.getNrPacienti() << endl;
-	cout << "Varstele pacientilor: ";
-	for (int i = 0;i < pacient5.getNrPacienti();i++) {
-		cout << pacient5.getVarstePacienti()[i] <<  ", ";
-	}
-	cout << endl;
-	cout << "Grad severitate: " << pacient5.getGrad() << endl;
-	cout << endl;
-	cout << endl;
-	
-	cout << "Operatorii: = , --, cast, +=." << endl;
-
-	//Operator =
-	Pacient pacient6;
-	pacient6 = pacient2;
-	cout << pacient6.getId() << endl;
-	cout << "Nume: " << pacient6.getNume() << endl;
-	cout << "Nr. pacienti: " << pacient6.getNrPacienti() << endl;
-	cout << "Varstele pacientilor: ";
-	for (int i = 0;i < pacient6.getNrPacienti();i++) {
-		cout << pacient6.getVarstePacienti()[i] << ", ";
-	}
-	cout << endl;
-	cout << "Grad severitate: " << pacient6.getGrad() << endl;
-	cout << endl;
-
-
-	cout << endl;
-	cout << endl;
-
-	cout << pacient2 << endl;
-	cout << endl;
-	//Operator --
-	Pacient pacient7;
-	--pacient2;
-	pacient7 = pacient2--;
-	cout << pacient2;
-	cout << endl;
-	cout << endl;
-	cout << pacient7;
-	cout << endl;
-	cout << endl;
-	
-	//operator cast
-	cout << "Numarul de pacienti cu numele de Ana este:" << endl;
-	int p = pacient5;
-	cout << p << endl;
-	cout << endl;
-	cout << endl;
-
-	cout << endl;
-	// Utilizare operator +=
-	pacient1 += pacient5;
-
-	cout << "\nPacient 1 dupa adaugare:" << endl;
-	pacient1.afisare();
-	cout << endl;
-	cout << endl;
-
-
-	cout << endl;
-
-
-	//MEDICAMENTE
-	cout << "Medicamente:" << endl;
-	string substante[] = {"Amoxicilina","Acid clavulanic"};
-	Medicamente medicament1;
-	medicament1.afisare();
-	cout << endl;
-	Medicamente medicament2(200, "Augmentin", 21.68, 2, substante);
-	medicament2.afisare();
-	cout << endl;
-	Medicamente medicament3(300, "Paracetamol");
-	medicament3.afisare();
-	cout << endl;
-	Medicamente medicament4 = medicament2;
-	medicament4.afisare();
-	cout << endl;
-	cout << endl;
-
-	//Getteri
-	Medicamente med5;
-	cout << med5.getId() << endl;
-	cout << "Nume medicament: " << med5.getNume() << endl;
-	cout << "Pret: " << med5.getPret() << endl;
-	cout << "Nr substante active: " << med5.getNrSubstante() << endl;
-	cout << "Substante active: -";
-	for (int i = 0;i < med5.getNrSubstante();i++) {
-		cout << med5.getSubstanteActive()[i] << endl;
-	}
-	cout << endl;
-	cout << "Nr. maxim de substante active: " << med5.getMaxSubstante() << endl;
-	cout << endl;
-	
-	//Setteri
-	string substanteNoi[] = { "Clorhidratul de drotaverina" };
-	med5.setNume("No-Spa");
-	med5.setPret(15.98);
-	med5.setSubstante(1, substanteNoi);
-	cout << "Nume medicament: " << med5.getNume() << endl;
-	cout << "Pret: " << med5.getPret() << endl;
-	cout << "Nr substante active: " << med5.getNrSubstante() << endl;
-	cout << "Substanta activa: ";
-	for (int i = 0;i < med5.getNrSubstante();i++) {
-		cout << med5.getSubstanteActive()[i] << endl;
-	}
-	cout << endl;
-	cout << endl;
-
-
-	cout <<"Operatorii: = , +=, ==, de scadere."<< endl;
-
-	//operator =
-	Medicamente med6;
-	med6 = medicament2;
-	cout << med6.getId() << endl;
-	cout << "Nume medicament: " << med6.getNume() << endl;
-	cout << "Pret: " << med6.getPret() << endl;
-	cout << "Nr substante active: " << med6.getNrSubstante() << endl;
-	cout << "Substante active: ";
-	for (int i = 0;i < med6.getNrSubstante();i++) {
-		cout << med6.getSubstanteActive()[i] << ", ";
-	}
-	cout << endl;
-	cout << "Nr. maxim de substante active: " << med6.getMaxSubstante() << endl;
-	cout << endl;
-	cout << endl;
-
-
-	//Operator +=
-	medicament2 += medicament3;
-
-	cout << "Pretul dupa adunare: " << medicament2.getPret() << endl;
-
-	cout << endl;
-	cout << endl;
-	//Operator ==
-	if (medicament1 == medicament2) {
-		cout << "Medicamentele sunt identice." << endl;
-	}
-	else {
-		cout << "Medicamentele sunt diferite." << endl;
+	// Afisare vector de obiecte Spital
+	for (const auto& spital : vectorSpitale) {
+		std::cout << spital << std::endl;  // Operatorul << pentru afișarea unui obiect Spital la consolă
 	}
 
+	// Vector de obiecte Pacient
+	std::vector<Pacient> vectorPacienti;
+	int numarPacienti;
 
-	cout << endl;
-	cout << endl;
+	std::cout << "Introduceti numarul de pacienti: ";
+	std::cin >> numarPacienti;
 
-	//Operator de scădere -
-	Medicamente medicamentDiferenta = medicament1 - medicament2;
-	cout << "Pretul diferentei: " << medicamentDiferenta.getPret() << endl;
+	for (int i = 0; i < numarPacienti; ++i) {
+		Pacient pacient;
+		std::cin >> pacient;  // Operatorul >> pentru citirea unui obiect Pacient de la tastatură
+		vectorPacienti.push_back(pacient);
+	}
+
+	// Afisare vector de obiecte Pacient
+	for (const auto& pacient : vectorPacienti) {
+		std::cout << pacient << std::endl;  // Operatorul << pentru afișarea unui obiect Pacient la consolă
+	}
+
+	// Matrice de obiecte Medicamente
+	const int rows = 2;
+	const int cols = 2;
+	Medicamente matriceMedicamente[rows][cols];
+
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			std::cin >> matriceMedicamente[i][j];  // Operatorul >> pentru citirea unui obiect Medicamente de la tastatură
+		}
+	}
+
+	// Afisare matrice de obiecte Medicamente
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			std::cout << matriceMedicamente[i][j] << std::endl;  // Operatorul << pentru afișarea unui obiect Medicamente la consolă
+		}
+	}
+
+	return 0;
+
+
+
+
 
 }
