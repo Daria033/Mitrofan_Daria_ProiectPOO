@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 using namespace std;
 
 class Spital
@@ -236,6 +237,12 @@ public:
 	}
 
 
+
+	friend ifstream& operator>>(ifstream& in, Spital& spital);
+
+	friend ofstream& operator<<(ofstream& out, const Spital& spital);
+
+
 	
 
 }; 
@@ -279,6 +286,35 @@ ostream& operator<<(ostream& out, const Spital& spital) {
 	return out;
 }
 
+
+ifstream& operator>>(ifstream& in, Spital& spital) {
+    in >> spital.nume;
+	in >> spital.nrMedici;
+	 in >> spital.nrSpecializari;
+	if (spital.numeSpecializari) {
+		delete[]spital.numeSpecializari;
+	}
+	spital.numeSpecializari = new string[spital.nrSpecializari];
+	
+	for (int i = 0; i < spital.nrSpecializari; i++) {
+		in >> spital.numeSpecializari[i];
+	}
+ 
+	return in;
+}
+
+ofstream& operator<<(ofstream& out, const Spital& spital) {
+	out << spital.nume << endl;
+	out << spital.nrMedici << endl;
+	out << spital.nrSpecializari << endl;
+	if (spital.nrSpecializari != NULL) {
+		for (int i = 0;i < spital.nrSpecializari;i++) {
+			out << spital.numeSpecializari[i] << endl;
+		}
+	}
+
+	return out;
+}
 
 
 
@@ -467,26 +503,12 @@ public:
 
 	friend istream& operator>>(istream& in, Pacient& pacient);
 		
+	friend ifstream& operator>>(ifstream& in, Pacient& pacient);
+	friend ofstream& operator<<(ofstream& out, const Pacient& pacient);
 
 };
 int Pacient::gradSeveritate = 4;
-//istream& operator>>(istream& in, Spital& spital) {
-//	cout << "Spitalul "; in >> spital.nume;
-//	//cout << " Orasul in care se afla spitalul este: "; in >> spital.adresa;
-//	cout << "Nr. medici: "; in >> spital.nrMedici;
-//	cout << "Nr. de specializari: "; in >> spital.nrSpecializari;
-//	if (spital.numeSpecializari) {
-//		delete[]spital.numeSpecializari;
-//	}
-//	spital.numeSpecializari = new string[spital.nrSpecializari];
-//	cout << "Specializarile sunt: ";
-//	for (int i = 0; i < spital.nrSpecializari; i++) {
-//		in >> spital.numeSpecializari[i];
-//	}
-//	cout << " Aceasta s-a infiintat in anul: "; in >> spital.anInfiintare;
-//	cout << endl;
-//	return in;
-//}
+
 
 
 istream& operator>>(istream& in, Pacient& pacient) {
@@ -519,6 +541,36 @@ ostream& operator<<(ostream& out, const Pacient& pacient) {
 
 	return out;
 }
+
+
+
+ifstream& operator>>(ifstream& in, Pacient& pacient) {
+	in >> pacient.nume;
+	in >> pacient.nrPacienti;
+
+	if (pacient.varstePacienti != NULL) {
+		delete[] pacient.varstePacienti;
+	}
+	pacient.varstePacienti = new int[pacient.nrPacienti];
+	for (int i = 0;i < pacient.nrPacienti;i++) {
+		in >> pacient.varstePacienti[i];
+	}
+	return in;
+}
+
+ofstream& operator<<(ofstream& out, const Pacient& pacient) {
+	out << pacient.nume << endl;
+	out << pacient.nrPacienti << endl;
+	if (pacient.nrPacienti != NULL) {
+		for (int i = 0;i < pacient.nrPacienti;i++) {
+			out << pacient.varstePacienti[i];
+		}
+	}
+
+	return out;
+}
+
+
 
 
 
@@ -706,6 +758,99 @@ public:
 	friend istream& operator>>(istream& in, Medicamente& medicament);
 
 
+
+
+	//void scrieInFisierBinar(fstream& f) {
+	//	//		f.write((char*)&this->RAM, sizeof(int));
+	//	//		int lungime = strlen(this->tipCPU);
+	//	//		f.write((char*)&lungime, sizeof(int));
+	//	//		for (int i = 0; i < lungime; i++) {
+	//	//			f.write((char*)&this->tipCPU[i], sizeof(char));
+	//	//		}
+	//	//		f.write((char*)&this->rezolutieEcran, sizeof(float));
+	//	//		f.write((char*)&this->cameraWeb, sizeof(bool));
+	//	//	}
+	//	//
+
+	//void scrieInFisierBinar(fstream& f) {
+	//	f.write((char*)&this->nume, sizeof(string));
+	//	f.write((char*)&this->pret, sizeof(float));
+	//	f.write((char*)&this->nrSubstante, sizeof(int));
+
+
+	//	int lungime = strlen(this->substanteActive.c_str());
+	//	for (int i = 0;i < lungime;i++) {
+	//		f.write((char*)&this->substanteActive[i], sizeof(string));
+	//	}
+
+
+	//}
+
+		/*const int id;
+string nume;
+float pret;
+int nrSubstante;
+string* substanteActive;
+static int nrMaximSubstante;*/
+
+	void serializare(string numeFisier) {
+		ofstream fisierBinar(numeFisier, ios::out, ios::binary);
+		int lungimeNume = this->nume.size();
+		fisierBinar.write((char*)&lungimeNume, sizeof(lungimeNume));
+		fisierBinar.write(this->nume.c_str(), lungimeNume + 1);
+
+		fisierBinar.write((char*)&this->pret, sizeof(pret));
+		fisierBinar.write((char*)&this->nrSubstante, sizeof(nrSubstante));
+
+		for (int i = 0;i < this->nrSubstante;i++) {
+			int lungimeSubstanteActive = this->substanteActive[i].size();
+			fisierBinar.write((char*)&lungimeSubstanteActive, sizeof(lungimeSubstanteActive));
+			fisierBinar.write(this->substanteActive[i].c_str(), lungimeSubstanteActive + 1);
+
+		}
+		fisierBinar.close();
+	
+	
+	}
+
+
+	void deserializare(string numeFisier) {
+		ifstream fisierBinar(numeFisier, ios::in, ios::binary);
+		if (fisierBinar.is_open()) {
+			if (this->substanteActive != NULL) {
+				delete[] this->substanteActive;
+		    }
+			int lungimeNume = 0;
+			fisierBinar.read((char*)&lungimeNume, sizeof(lungimeNume));
+			char* aux = new char[lungimeNume + 1];
+			fisierBinar.read(aux, lungimeNume + 1);
+			this->nume = aux;
+			delete[]aux;
+
+			fisierBinar.read((char*)&this->pret, sizeof(pret));
+			fisierBinar.read((char*)&this->nrSubstante, sizeof(nrSubstante));
+
+			this->substanteActive = new string[this->nrSubstante];
+			for (int i = 0;i < this->nrSubstante;i++) {
+				int lungimeSubstanteActive = 0;
+				fisierBinar.read((char*)&lungimeSubstanteActive, sizeof(lungimeSubstanteActive));
+				char* aux1 = new char[lungimeSubstanteActive + 1];
+				fisierBinar.read(aux1, lungimeSubstanteActive + 1);
+				this->substanteActive[i] = aux1;
+				delete[]aux1;
+			}
+		}
+		else {
+			cout << "Fisierul binar nu a fost gasit.";
+		}
+		
+
+	}
+
+
+
+
+
 };
 int Medicamente::nrMaximSubstante = 5;
 
@@ -818,10 +963,42 @@ public:
 	}
 
 
+	/*const Spital& spital;
+	string numeSectie;
+	int nrMediciSectie;*/
+
+
+	void serializare(string numeFisier) {
+		ofstream fisierBinar(numeFisier, ios::out, ios::binary);
+		int lungimeNumeSectie = this->numeSectie.size();
+		fisierBinar.write((char*)&lungimeNumeSectie, sizeof(lungimeNumeSectie));
+		fisierBinar.write(this->numeSectie.c_str(), lungimeNumeSectie + 1);
+
+		fisierBinar.write((char*)&this->nrMediciSectie, sizeof(nrMediciSectie));
+
+		fisierBinar.close();
+	}
+
+
+	void deserializare(string numeFisier) {
+		ifstream fisierBinar(numeFisier, ios::in, ios::binary);
+		if (fisierBinar.is_open()) {
+			int lungimeNumeSectie = 0;
+			fisierBinar.read((char*)&lungimeNumeSectie, sizeof(lungimeNumeSectie));
+			char* aux = new char[lungimeNumeSectie + 1];
+			fisierBinar.read(aux, lungimeNumeSectie + 1);
+			this->numeSectie = aux;
+			delete[]aux;
+
+			fisierBinar.read((char*)&this->nrMediciSectie, sizeof(nrMediciSectie));
+		}
+		else {
+			cout << "Fisierul binar nu a fost gasit.";
+		}
+
+	}
+
 };
-
-
-
 
 
 
@@ -829,25 +1006,54 @@ public:
 
 int main()
 {   
+
+
+	//Clasa Spital
+	//Fisiere text
+
+	Spital spital1;
 	
-	Spital spitalBrasov;
-	SectieSpital sectie1(spitalBrasov, "Chirurgie", 15);
-	SectieSpital sectie2(spitalBrasov, "Ortopedie", 10);
+	cin >> spital1;
+	ofstream afisare("spitale.txt", ios::out);
+	afisare << spital1;
+	afisare.close();
 
-	// Utilizare getteri
-	cout << "Sectia " << sectie1.getNumeSectie() << " are " << sectie1.getNrMediciSectie() << " medici." << endl;
 
-	// Utilizare metoda specifica
-	sectie1.afisareDetalii();
+	Spital spital2;
+	ifstream citire("spitale.txt", ios::in);
+	citire >> spital2;
+	cout << spital2;
+	citire.close();
 
-	
-	sectie1 = sectie2;
-	cout << "Sectii dupa atribuire: " << sectie1 << endl;
 
-	++sectie1;
-	cout << "Numar medici dupa incrementare: " << sectie1.getNrMediciSectie() << endl;
+	cout << endl;
 
-	return 0;
-	
-	
+	//Clasa Pacient 
+	//Fisiere text
+	Pacient pacient1;
+
+	cin >> pacient1;
+	ofstream f("pacienti.txt", ios::out);
+	f << pacient1;
+	f.close();
+
+
+	Pacient pacient2;
+	ifstream g("pacienti.txt", ios::in);
+	g >> pacient2;
+	cout << pacient2;
+	g.close();
+
+
+
+	//Clasa Medicamente
+	//Fisiere binare
+	Medicamente med1;
+	Medicamente medBinar;
+	med1.serializare("fisierBinar.bin");
+	medBinar.deserializare("fisierBinar.bin");
+	cout << medBinar << endl;
+
+
+
 }
