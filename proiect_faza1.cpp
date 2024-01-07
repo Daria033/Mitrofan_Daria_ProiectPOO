@@ -11,6 +11,7 @@ class Spital
 {
 private:
 	const string adresa;
+
 	string nume;
 	int nrMedici;
 	int nrSpecializari;
@@ -278,6 +279,7 @@ ostream& operator<<(ostream& out, const Spital& spital) {
 		for (int i = 0;i < spital.nrSpecializari;i++) {
 			out << spital.numeSpecializari[i] << ", ";
 		}
+		cout << endl;
 	}
 	else {
 		out << " - ";
@@ -968,37 +970,124 @@ public:
 	int nrMediciSectie;*/
 
 
-	void serializare(string numeFisier) {
-		ofstream fisierBinar(numeFisier, ios::out, ios::binary);
-		int lungimeNumeSectie = this->numeSectie.size();
-		fisierBinar.write((char*)&lungimeNumeSectie, sizeof(lungimeNumeSectie));
-		fisierBinar.write(this->numeSectie.c_str(), lungimeNumeSectie + 1);
+};
 
-		fisierBinar.write((char*)&this->nrMediciSectie, sizeof(nrMediciSectie));
 
-		fisierBinar.close();
+
+// Mostenire
+
+class Medic : public Spital {
+private:
+	string specializareMedic;
+	int aniExperienta;
+
+public:
+	Medic() :Spital() {
+		this->specializareMedic = "Cardiologie";
+		this->aniExperienta = 0;
+	}
+	//constructor cu toti parametrii
+	Medic(const string adresa, string nume, int nrMedici, int nrSpecializari, string* numeSpecializari, bool areDepartamente, string specializareMedic, int aniExperienta) :Spital(adresa, nume, nrMedici, nrSpecializari, numeSpecializari, areDepartamente) {
+		this->specializareMedic = specializareMedic;
+		this->aniExperienta = aniExperienta;
+
 	}
 
+	//constructor de copiere
+	Medic(const Medic& medic) :Spital(medic) {
+		this->specializareMedic = medic.specializareMedic;
+		this->aniExperienta = medic.aniExperienta;
+	}
 
-	void deserializare(string numeFisier) {
-		ifstream fisierBinar(numeFisier, ios::in, ios::binary);
-		if (fisierBinar.is_open()) {
-			int lungimeNumeSectie = 0;
-			fisierBinar.read((char*)&lungimeNumeSectie, sizeof(lungimeNumeSectie));
-			char* aux = new char[lungimeNumeSectie + 1];
-			fisierBinar.read(aux, lungimeNumeSectie + 1);
-			this->numeSectie = aux;
-			delete[]aux;
+	//operator =
+	Medic& operator=(const Medic& medic) {
+		Spital::operator=(medic);
+		this->specializareMedic = medic.specializareMedic;
+		this->aniExperienta = medic.aniExperienta;
+		return *this;
+	}
 
-			fisierBinar.read((char*)&this->nrMediciSectie, sizeof(nrMediciSectie));
-		}
-		else {
-			cout << "Fisierul binar nu a fost gasit.";
-		}
+	~Medic() {
 
 	}
+
+	friend ostream& operator<<(ostream& out, const Medic& medic) {
+		out << (Spital)medic;
+		out << "Unul dintre medici ere sprecializarea: " << medic.specializareMedic << endl;
+		out << "Ani exeperienta in domeniu: " << medic.aniExperienta << endl;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Medic& medic) {
+		in >> (Spital&)medic;
+		cout << "Unul dintre medici are specializarea: ";
+		in >> medic.specializareMedic;
+		cout << "Ani experienta in domeniu: ";
+		in >> medic.aniExperienta;
+		return in;
+
+
+	}
+};
+
+
+
+class Chirurgie : public Spital {
+private:
+	int nrSaliChirurgie;
+	bool areEchipamenteChirurgicale;
+public:
+
+	Chirurgie() :Spital() {
+		this->nrSaliChirurgie = 0;
+		this->areEchipamenteChirurgicale = 0;
+	}
+
+	//constructor cu toti parametri
+	Chirurgie(const string adresa, string nume, int nrMedici, int nrSpecializari, string* numeSpecializari, bool areDepartamente, int nrSaliChirurgie, bool areEchipamenteChirurgicale) :Spital(adresa, nume, nrMedici, nrSpecializari, numeSpecializari, areDepartamente) {
+		this->nrSaliChirurgie = nrSaliChirurgie;
+		this->areEchipamenteChirurgicale = areEchipamenteChirurgicale;
+
+	}
+
+	//constructor de copiere
+	Chirurgie(const Chirurgie& c) :Spital(c) {
+		this->nrSaliChirurgie = c.nrSaliChirurgie;
+		this->areEchipamenteChirurgicale = c.areEchipamenteChirurgicale;
+	}
+
+	//operator=
+	Chirurgie& operator=(const Chirurgie& c) {
+		Spital::operator=(c);
+		this->nrSaliChirurgie = c.nrSaliChirurgie;
+		this->areEchipamenteChirurgicale = c.areEchipamenteChirurgicale;
+		return *this;
+	}
+
+	~Chirurgie() {
+
+	}
+
+	friend ostream& operator<<(ostream& out, Chirurgie& c) {
+		out << (Spital)c;
+		out << "Nr. de sali din departamentul chirurgie este: " << c.nrSaliChirurgie << endl;
+		out << "Are echipamente chirurgicale?(1-Da sau 0-Nu): " << c.areEchipamenteChirurgicale << endl;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Chirurgie& c) {
+		in >> (Spital&)c;
+		cout << "Nr.de sali din departamentul chirurgie este : ";
+		in >> c.nrSaliChirurgie;
+		cout << "Are echipamente chirurgicale?(1-Da sau 0-Nu): ";
+		in >> c.areEchipamenteChirurgicale;
+		return in;
+	}
+
 
 };
+
+
 
 
 
@@ -1007,52 +1096,32 @@ public:
 int main()
 {   
 
+	//-----------MOSTENIRE-------------------
+	//Clasa Medic
+	string nume[] = { " Chirurgie cardiovasculara ", "Cardiologie","Pneumologie", "Endocrinologie" };
+	Medic medic1("Bucuresti", "de Urgenta 'Sfantul Pantelimon'", 140, 4, nume, true, "Chirurgie", 5);
+	cout << medic1 << endl;
 
-	//Clasa Spital
-	//Fisiere text
+	Medic medic2;
+	medic2 = medic1;
+	cout << medic2 << endl;
 
-	Spital spital1;
-	
-	cin >> spital1;
-	ofstream afisare("spitale.txt", ios::out);
-	afisare << spital1;
-	afisare.close();
-
-
-	Spital spital2;
-	ifstream citire("spitale.txt", ios::in);
-	citire >> spital2;
-	cout << spital2;
-	citire.close();
-
-
-	cout << endl;
-
-	//Clasa Pacient 
-	//Fisiere text
-	Pacient pacient1;
-
-	cin >> pacient1;
-	ofstream f("pacienti.txt", ios::out);
-	f << pacient1;
-	f.close();
-
-
-	Pacient pacient2;
-	ifstream g("pacienti.txt", ios::in);
-	g >> pacient2;
-	cout << pacient2;
-	g.close();
+	cin >> medic2;
+	cout << medic2 << endl;
 
 
 
-	//Clasa Medicamente
-	//Fisiere binare
-	Medicamente med1;
-	Medicamente medBinar;
-	med1.serializare("fisierBinar.bin");
-	medBinar.deserializare("fisierBinar.bin");
-	cout << medBinar << endl;
+	//Clasa Chirurgie
+	Chirurgie c1("Bucuresti", "de Urgenta 'Sfantul Pantelimon'", 140, 4, nume, true, 4, 1);
+	cout << c1 << endl;
+
+	Chirurgie c2;
+	c2 = c1;
+	cout << c2 << endl;
+
+	cin >> c2;
+	cout << c2 << endl;
+
 
 
 
