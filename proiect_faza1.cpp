@@ -7,7 +7,14 @@
 #include <fstream>
 using namespace std;
 
-class Spital
+
+class Abstracta {
+public:
+	virtual int returneazaCevaInt() = 0;
+};
+
+
+class Spital: public Abstracta
 {
 private:
 	const string adresa;
@@ -245,6 +252,17 @@ public:
 
 
 	
+
+	//Functie virtuala
+
+	virtual string Mesaj() {
+		return "Medicii au experienta de peste 5 ani.\n";
+
+	}
+
+	int returneazaCevaInt() {
+		return this->nrMedici;
+	}
 
 }; 
 int Spital::anInfiintare = 1923;
@@ -970,6 +988,7 @@ public:
 	int nrMediciSectie;*/
 
 
+
 };
 
 
@@ -1028,6 +1047,18 @@ public:
 
 
 	}
+
+	string Mesaj() {
+		return "Medicii au experienta de peste 3 ani.\n";
+
+	}
+
+
+
+	int returneazaCevaInt() {
+		return this->aniExperienta;
+	}
+
 };
 
 
@@ -1089,6 +1120,83 @@ public:
 
 
 
+//has-a
+
+class Oras {
+	string nume;
+	int nrSpitale;
+	Spital** spitale;
+public:
+
+	Oras() {
+		this->nume = "";
+		this->nrSpitale = 0;
+		this->spitale = nullptr;
+	}
+
+	Oras(string nume, int nrSpitale, Spital** spitale) {
+		this->nume = nume;
+		this->nrSpitale = nrSpitale;
+		this->spitale = new Spital * [this->nrSpitale];
+		for (int i = 0;i < this->nrSpitale;i++) {
+			this->spitale[i] = new Spital(*spitale[i]);
+			//this->spitale[i] = spitale[i];
+		}
+	}
+
+	Oras(const Oras& oras) {
+		this->nume = oras.nume;
+		this->nrSpitale = oras.nrSpitale;
+		this->spitale = new Spital * [this->nrSpitale];
+		for (int i = 0;i < this->nrSpitale;i++) {
+			this->spitale[i] = new Spital(*oras.spitale[i]);
+		}
+	}
+
+	~Oras() {
+		if (this->spitale != NULL) {
+			for (int i = 0;i < this->nrSpitale;i++) {
+				delete spitale[i];
+			}
+			delete[] spitale;
+		}
+	}
+	//operator=
+	Oras& operator=(const Oras& oras) {
+		if (this != &oras) {
+			if (this->spitale != NULL) {
+				for (int i = 0;i < this->nrSpitale;i++) {
+					delete spitale[i];
+				}
+				delete[] spitale;
+			}
+			this->nume = oras.nume;
+			this->nrSpitale = oras.nrSpitale;
+			this->spitale = new Spital * [this->nrSpitale];
+			for (int i = 0;i < this->nrSpitale;i++) {
+				this->spitale[i] = new Spital(*oras.spitale[i]);
+			}
+			return *this;
+		}
+	}
+
+	friend ostream& operator<<(ostream& out, const Oras& oras) {
+		out << "Nume: " << oras.nume << endl;
+		out << "Nr. spitale: " << oras.nrSpitale << endl;
+		out << "Spitale: " << endl;
+		for (int i = 0;i < oras.nrSpitale;i++) {
+			out << oras.spitale[i] << endl;
+		}
+		return out;
+	}
+
+
+
+};
+
+
+
+
 
 
 
@@ -1106,8 +1214,8 @@ int main()
 	medic2 = medic1;
 	cout << medic2 << endl;
 
-	cin >> medic2;
-	cout << medic2 << endl;
+	/*cin >> medic2;
+	cout << medic2 << endl;*/
 
 
 
@@ -1119,8 +1227,48 @@ int main()
 	c2 = c1;
 	cout << c2 << endl;
 
-	cin >> c2;
-	cout << c2 << endl;
+	/*cin >> c2;
+	cout << c2 << endl;*/
+
+
+	//Functii virtuale
+
+	Spital spital1;
+	Spital spital2("Bucuresti", "de Urgenta 'Sfantul Pantelimon'", 140, 4, nume, true);
+	Spital spital3("Iasi", "de Urgenta 'Sfantul Mihail'");
+
+	cout << spital1.Mesaj() << endl;
+	cout << medic2.Mesaj() << endl;
+
+
+	//Late binding
+	Spital* sp;
+	Medic* mp = new Medic();
+	sp = mp;  //pun in sp adresa lui mp
+	cout << sp->Mesaj() << endl;
+	cout << mp->Mesaj() << endl;
+
+
+
+	//fct virtuala abstracta
+
+	Spital* vectorSpitale[3];
+	vectorSpitale[0] = &spital1;
+	vectorSpitale[1] = &spital2;
+	vectorSpitale[2] = &medic1;
+	for (int i = 0;i < 3;i++) {
+		cout << vectorSpitale[i]->returneazaCevaInt() << endl;
+	}
+
+
+
+	//----------HAS A------------
+	Oras oras1("Bucuresti", 3, vectorSpitale);
+	cout << oras1 << endl;
+
+
+
+	
 
 
 
