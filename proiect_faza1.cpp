@@ -403,7 +403,7 @@ public:
 	const int getId() {
 		return this->id;
 	}
-	string getNume() {
+	string getNume() const{
 		return this->nume;
 	}
 	int getNrPacienti() {
@@ -988,6 +988,35 @@ public:
 	int nrMediciSectie;*/
 
 
+	void serializare(string numeFisier) {
+		ofstream fisierBinar(numeFisier, ios::out, ios::binary);
+		int lungimeNumeSectie = this->numeSectie.size();
+		fisierBinar.write((char*)&lungimeNumeSectie, sizeof(lungimeNumeSectie));
+		fisierBinar.write(this->numeSectie.c_str(), lungimeNumeSectie + 1);
+
+		fisierBinar.write((char*)&this->nrMediciSectie, sizeof(nrMediciSectie));
+
+		fisierBinar.close();
+	}
+
+
+	void deserializare(string numeFisier) {
+		ifstream fisierBinar(numeFisier, ios::in, ios::binary);
+		if (fisierBinar.is_open()) {
+			int lungimeNumeSectie = 0;
+			fisierBinar.read((char*)&lungimeNumeSectie, sizeof(lungimeNumeSectie));
+			char* aux = new char[lungimeNumeSectie + 1];
+			fisierBinar.read(aux, lungimeNumeSectie + 1);
+			this->numeSectie = aux;
+			delete[]aux;
+
+			fisierBinar.read((char*)&this->nrMediciSectie, sizeof(nrMediciSectie));
+		}
+		else {
+			cout << "Fisierul binar nu a fost gasit.";
+		}
+
+	}
 
 };
 
@@ -1185,7 +1214,7 @@ public:
 		out << "Nr. spitale: " << oras.nrSpitale << endl;
 		out << "Spitale: " << endl;
 		for (int i = 0;i < oras.nrSpitale;i++) {
-			out << oras.spitale[i] << endl;
+			out << oras.spitale[i]->getNume() << endl;
 		}
 		return out;
 	}
@@ -1197,12 +1226,82 @@ public:
 
 
 
-
-
-
-
 int main()
 {   
+
+
+	//Clasa Spital
+	//Fisiere text
+
+	/////*Spital spital1;
+	////
+	////cin >> spital1;
+	////ofstream afisare("spitale.txt", ios::out);
+	////afisare << spital1;
+	////afisare.close();
+
+
+	////Spital spital2;
+	////ifstream citire("spitale.txt", ios::in);
+	////citire >> spital2;
+	////cout << spital2;
+	////citire.close();*/
+
+	//Fisiere text
+	/*Spital spital1;
+	Spital spital2;
+	ofstream f("spitale.txt", ios::out);
+	f << spital1 << endl;
+	cout << "Obiectul a fost scris in text!" << endl;
+	f.close();
+
+	ifstream g("spitale.txt", ios::in);
+	if (g.is_open()) {
+		g >> spital2;
+		cout << "Obiectul a fost citit din text!" << endl;
+		g.close();
+	}
+	else {
+		cout << "Fisierul nu exixta." << endl;
+	}
+
+	cout << spital2 << endl;*/
+
+
+	////cout << endl;
+
+	//////Clasa Pacient 
+	//////Fisiere text
+	////Pacient pacient1;
+
+	////cin >> pacient1;
+	////ofstream f("pacienti.txt", ios::out);
+	////f << pacient1;
+	////f.close();
+
+
+	////Pacient pacient2;
+	////ifstream g("pacienti.txt", ios::in);
+	////g >> pacient2;
+	////cout << pacient2;
+	////g.close();
+
+
+
+	//////Clasa Medicamente
+	//////Fisiere binare
+	////Medicamente med1;
+	////Medicamente medBinar;
+	////med1.serializare("fisierBinar.bin");
+	////medBinar.deserializare("fisierBinar.bin");
+	////cout << medBinar << endl;
+
+
+
+
+
+
+
 
 	//-----------MOSTENIRE-------------------
 	//Clasa Medic
@@ -1260,17 +1359,11 @@ int main()
 		cout << vectorSpitale[i]->returneazaCevaInt() << endl;
 	}
 
-
+	cout << endl << endl;
 
 	//----------HAS A------------
 	Oras oras1("Bucuresti", 3, vectorSpitale);
 	cout << oras1 << endl;
-
-
-
-	
-
-
 
 
 }
